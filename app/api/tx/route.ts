@@ -1,5 +1,5 @@
-import { AnchorProvider, BN, Idl, Program } from "@coral-xyz/anchor";
-import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import { AnchorProvider, BN, Idl, Program, Wallet } from "@coral-xyz/anchor";
+import { Connection, Keypair, PublicKey, SystemProgram, Transaction, VersionedTransaction } from "@solana/web3.js";
 import { NextResponse } from "next/server";
 import idl from "../../../idl/nuoiai.json";
 
@@ -52,17 +52,24 @@ function loadKeypair() {
   return Keypair.fromSecretKey(Uint8Array.from(parsed));
 }
 
-function createWallet(keypair: Keypair) {
-  return {
-    publicKey: keypair.publicKey,
-    signTransaction: async (tx: Transaction) => {
+type WalletWithPayer = Wallet & { payer: Keypair };
+
+function createWallet(keypair: Keypair): WalletWithPayer {
+  const signOne = <T extends Transaction | VersionedTransaction>(tx: T): T => {
+    if (tx instanceof Transaction) {
       tx.partialSign(keypair);
       return tx;
-    },
-    signAllTransactions: async (txs: Transaction[]) => {
-      txs.forEach((tx) => tx.partialSign(keypair));
-      return txs;
-    },
+    }
+    tx.sign([keypair]);
+    return tx;
+  };
+
+  return {
+    publicKey: keypair.publicKey,
+    payer: keypair,
+    signTransaction: async <T extends Transaction | VersionedTransaction>(tx: T) => signOne(tx),
+    signAllTransactions: async <T extends Transaction | VersionedTransaction>(txs: T[]) =>
+      txs.map((tx) => signOne(tx)),
   };
 }
 

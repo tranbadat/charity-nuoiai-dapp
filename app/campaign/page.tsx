@@ -108,6 +108,16 @@ export default function CampaignPage() {
     return getProgram(getProvider(connection, wallet));
   }, [connection, wallet]);
 
+  const accountClient = useMemo(() => {
+    if (!program) {
+      return null;
+    }
+    return program.account as unknown as {
+      campaign: { fetch: (address: PublicKey) => Promise<CampaignAccount> };
+      withdrawRequest: { fetch: (address: PublicKey) => Promise<WithdrawAccount> };
+    };
+  }, [program]);
+
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -133,7 +143,8 @@ export default function CampaignPage() {
 
   async function loadCampaign() {
     resetMessages();
-    if (!program) {
+    const client = accountClient;
+    if (!program || !client) {
       setError("Vui lòng kết nối ví trước.");
       return;
     }
@@ -149,7 +160,7 @@ export default function CampaignPage() {
       const [campaignPdaKey] = campaignPda(creatorKey, campaignIdBn);
       const [vaultPdaKey] = vaultPda(campaignPdaKey);
 
-      const data = (await program.account.campaign.fetch(campaignPdaKey)) as CampaignAccount;
+      const data = await client.campaign.fetch(campaignPdaKey);
       setCampaign(data);
       setCampaignAddress(campaignPdaKey.toBase58());
       setVaultAddress(vaultPdaKey.toBase58());
@@ -158,7 +169,7 @@ export default function CampaignPage() {
       for (let i = 0; i < data.nextWithdrawIndex; i += 1) {
         const [withdrawKey] = withdrawPda(campaignPdaKey, new BN(i));
         try {
-          const request = (await program.account.withdrawRequest.fetch(withdrawKey)) as WithdrawAccount;
+          const request = await client.withdrawRequest.fetch(withdrawKey);
           requests.push(request);
         } catch {
           // ignore missing
