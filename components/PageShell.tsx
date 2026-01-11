@@ -13,6 +13,7 @@ type PageShellProps = {
 };
 
 const NAV_LINKS = [
+  { href: "/landing", label: "Giới thiệu" },
   { href: "/", label: "Trang chủ" },
   { href: "/list", label: "Tất cả tài khoản" },
   { href: "/campaign", label: "Chiến dịch" },

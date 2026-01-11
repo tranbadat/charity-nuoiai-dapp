@@ -306,6 +306,71 @@ button:disabled {
   align-items: flex-end;
 }
 
+.button-link.secondary {
+  background: #2f2f2f;
+}
+
+.landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 16px;
+}
+
+.landing-card {
+  background: #fff3e1;
+  border: 1px solid #f0d5a9;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.landing-highlight {
+  background: #0f2459;
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid #0c1e4a;
+}
+
+.landing-highlight .muted {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.flow-steps {
+  display: grid;
+  gap: 12px;
+}
+
+.flow-step {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f9f7f2;
+  border: 1px solid var(--border);
+}
+
+.flow-step .step-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -357,6 +422,10 @@ button:disabled {
 
   .action-item {
     align-items: flex-start;
+  }
+
+  .landing-hero {
+    grid-template-columns: 1fr;
   }
 
   .truncate {
