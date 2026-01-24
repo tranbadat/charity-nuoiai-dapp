@@ -1,0 +1,32 @@
+services:
+  app:
+    build: .
+    command: npm run dev
+    depends_on:
+      - ipfs
+    env_file:
+      - .env.development
+    environment:
+      - NEXT_PUBLIC_IPFS_API_URL=http://ipfs:8080/ipfs
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+  ipfs:
+    image: ipfs/kubo:latest
+    container_name: ipfs-local
+    ports:
+      - "4001:4001"   # p2p
+      - "5001:5001"   # API
+      - "8080:8080"   # Gateway
+    volumes:
+      - ipfs_data:/data/ipfs
+    # command: ["ipfs", "daemon", "--migrate=true"]
+    # restart: unless-stopped
+
+volumes:
+  ipfs_data:
